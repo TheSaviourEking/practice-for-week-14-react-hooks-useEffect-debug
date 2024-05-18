@@ -8,21 +8,23 @@ const RandomUserTwo = () => {
   const [num, setNum] = useState(0);
   const [searchChange, setSearchChange] = useState('');
   const [searchWord, setSearchWord] = useState(
-    localStorage.setItem('user') || 'foobar'
+    localStorage.getItem('user') || 'foobar'
   );
-  
+
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const fetchUser = () => {
+    const fetchUser = async () => {
+      console.log(searchWord, 'searchWord');
       const res = await fetch(`https://randomuser.me/api/?seed=${searchWord}`);
       const data = await res.json();
-      setData(data.results);
+      setData((prev) => data.results);
     };
-  }, []);
+    fetchUser();
+  }, [searchWord]);
 
   useEffect(() => {
-    localStorage.getItem('user', searchWord);
+    localStorage.setItem('user', searchWord);
   }, [searchWord]);
 
   useEffect(() => {
@@ -30,6 +32,8 @@ const RandomUserTwo = () => {
       console.log('i am running');
       setNum((prevNum) => (prevNum === 3 ? 0 : prevNum + 1));
     }, 7000);
+
+    return () => clearInterval(colorInterval);
   }, []);
 
   return (
@@ -46,12 +50,11 @@ const RandomUserTwo = () => {
         ))}
       </div>
       <div className='form-wrapper'>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setSearchWord(searchChange);
-            setSearchChange('');
-          }}
+        <form onSubmit={(e) => {
+          e.preventDefault();
+          setSearchWord(searchChange);
+          setSearchChange('');
+        }}
         >
           <label htmlFor='search'>Search:</label>
           <input
@@ -61,7 +64,13 @@ const RandomUserTwo = () => {
             name='searchWord'
             placeholder='Username'
           />
-          <button type='submit'>Submit</button>
+          <button type='submit'
+          //   onClick={(e) => {
+          //   e.preventDefault();
+          //   setSearchWord(searchChange);
+          //   setSearchChange(''); 
+          // }}
+          >Submit</button>
         </form>
       </div>
     </div>
